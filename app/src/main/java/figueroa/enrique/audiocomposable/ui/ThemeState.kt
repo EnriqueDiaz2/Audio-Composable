@@ -14,7 +14,7 @@ object ThemeState {
         modoOscuro.value = prefs.getBoolean(KEY_MODO_OSCURO, false)
     }
 
-    fun cambiar(context: Context, valor: Boolean) {
+    fun guardar(context: Context, valor: Boolean) {
         modoOscuro.value = valor
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_MODO_OSCURO, valor).apply()

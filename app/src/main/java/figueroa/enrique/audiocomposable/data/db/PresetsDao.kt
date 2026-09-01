@@ -4,16 +4,21 @@ import androidx.room3.Dao
 import androidx.room3.Delete
 import androidx.room3.Insert
 import androidx.room3.Query
+import androidx.room3.Update
+import kotlinx.coroutines.flow.Flow
 import figueroa.enrique.audiocomposable.data.model.Preset
 
 @Dao
 interface PresetsDao {
-    @Query("SELECT * FROM presets")
-    fun getAllPresets(): List<Preset>
+    @Query("SELECT * FROM presets ORDER BY id DESC")
+    fun obtenerPresets(): Flow<List<Preset>>
 
     @Insert
-    fun insertPreset(preset: Preset)
+    suspend fun insertPreset(preset: Preset): Long
+
+    @Update
+    suspend fun actualizarPreset(preset: Preset)
 
     @Delete
-    fun deletePreset(preset: Preset)
+    suspend fun eliminarPreset(preset: Preset)
 }
