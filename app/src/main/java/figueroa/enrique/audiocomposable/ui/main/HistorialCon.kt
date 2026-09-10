@@ -212,6 +212,7 @@ fun HistorialScreen(viewModel: HistorialViewModel) {
                             modifier = Modifier
                                 .padding(12.dp)
                                 .background(knobBackground)
+                                .fillMaxSize()
                         ) {
                             Text(item.presetName)
                             Text(formatearFecha(item.fechaHora))

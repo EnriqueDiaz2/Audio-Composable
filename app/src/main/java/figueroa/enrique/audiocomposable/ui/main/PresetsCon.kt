@@ -178,7 +178,9 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
                     titleContentColor = LightBottomNavBackground
                 ),
                 actions = {
-                    IconButton(onClick = { context.startActivity(Intent(context, SettingsCon::class.java)) }) {
+                    IconButton(onClick = {
+                        context.startActivity(Intent(context, SettingsCon::class.java))
+                    }) {
                         Icon(
                             imageVector = Settings,
                             contentDescription = "Configuración",
@@ -195,21 +197,46 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
             ) {
                 NavigationBarItem(
                     selected = false,
-                    onClick = { context.startActivity(Intent(context, MainActivity::class.java)) },
-                    icon = { Icon(imageVector = Home, contentDescription = "Inicio") },
-                    label = { Text("Inicio") }
+                    onClick = {
+                        context.startActivity(Intent(context, MainActivity::class.java))
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Home,
+                            contentDescription = "Inicio"
+                        )
+                    },
+                    label = {
+                        Text("Inicio")
+                    }
                 )
                 NavigationBarItem(
                     selected = true,
                     onClick = {},
-                    icon = { Icon(imageVector = Tune, contentDescription = "Presets") },
-                    label = { Text("Presets") }
+                    icon = {
+                        Icon(
+                            imageVector = Tune,
+                            contentDescription = "Presets"
+                        )
+                    },
+                    label = {
+                        Text("Presets")
+                    }
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { context.startActivity(Intent(context, HistorialCon::class.java)) },
-                    icon = { Icon(imageVector = History, contentDescription = "Historial") },
-                    label = { Text("Historial") }
+                    onClick = {
+                        context.startActivity(Intent(context, HistorialCon::class.java))
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = History,
+                            contentDescription = "Historial"
+                        )
+                    },
+                    label = {
+                        Text("Historial")
+                    }
                 )
             }
         }
@@ -227,25 +254,45 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text(text = "Nombre Del Preset", color = textSecondary) },
+                    label = {
+                        Text(
+                            text = "Nombre Del Preset",
+                            color = textSecondary
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = gener,
                     onValueChange = { gener = it },
-                    label = { Text(text = "Genero", color = textSecondary) },
+                    label = {
+                        Text(
+                            text = "Genero",
+                            color = textSecondary
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = place,
                     onValueChange = { place = it },
-                    label = { Text(text = "Lugar", color = textSecondary) },
+                    label = {
+                        Text(
+                            text = "Lugar",
+                            color = textSecondary
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = parameters,
                     onValueChange = { parameters = it },
-                    label = { Text(text = "Parametros", color = textSecondary) },
+                    label = {
+                        Text(
+                            text = "Parametros",
+                            color = textSecondary
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 FloatingActionButton(

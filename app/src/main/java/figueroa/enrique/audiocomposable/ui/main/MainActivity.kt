@@ -75,6 +75,7 @@ import figueroa.enrique.audiocomposable.ui.theme.LightTextSecondary
 import figueroa.enrique.audiocomposable.ui.views.BypassButton
 import figueroa.enrique.audiocomposable.ui.views.SpectrumVisualizer
 import figueroa.enrique.audiocomposable.ui.views.VuMeter
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,7 +84,7 @@ class MainActivity : ComponentActivity() {
         ThemeState.cargar(this)
         setContent {
             AudioComposableTheme(
-                darkTheme = ThemeState.modoOscuro.value
+                darkTheme = true
             ) {
                 PantallaPrincipal()
             }
@@ -94,8 +95,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaPrincipal() {
-    val darkTheme = ThemeState.modoOscuro.value
-
+    val darkTheme = true
     val background =
         if (darkTheme)
             DarkBackground
@@ -159,9 +159,8 @@ fun PantallaPrincipal() {
     var bypassActivo by remember { mutableStateOf(false) }
 
     val spectrumValues = remember {
-
         List(32) {
-            kotlin.random.Random.nextFloat()
+            Random.nextFloat()
         }
     }
 
@@ -338,6 +337,7 @@ fun PantallaPrincipal() {
                     label = "Treashol",
                     value = threshold,
                     onValueChange = { threshold = it },
+                    onValueChangeFinished = {},
                     valueText = { "${(it * 100 - 60).toInt()} dB" }, // ejemplo: rango -60dB a 0dB
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -352,6 +352,7 @@ fun PantallaPrincipal() {
                     label = "Radio",
                     value = ratio,
                     onValueChange = { ratio = it },
+                    onValueChangeFinished = {},
                     valueText = { "${(1 + it * 9).toInt()}:1" }, // ejemplo: rango 1:1 a 10:1
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -366,6 +367,7 @@ fun PantallaPrincipal() {
                     label = "Ataque",
                     value = ataque,
                     onValueChange = { ataque = it },
+                    onValueChangeFinished = {},
                     valueText = { "${(it * 100).toInt()} ms" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -380,6 +382,7 @@ fun PantallaPrincipal() {
                     label = "Release",
                     value = release,
                     onValueChange = { release = it },
+                    onValueChangeFinished = {},
                     valueText = { "${(it * 500).toInt()} ms" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -394,6 +397,7 @@ fun PantallaPrincipal() {
                     label = "Knee",
                     value = knee,
                     onValueChange = { knee = it },
+                    onValueChangeFinished = {},
                     valueText = { "${(it * 10).toInt()} dB" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -408,6 +412,7 @@ fun PantallaPrincipal() {
                     label = "Makeup",
                     value = makeup,
                     onValueChange = { makeup = it },
+                    onValueChangeFinished = {},
                     valueText = { "${(it * 40).toInt()} dB" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -421,6 +426,7 @@ fun PantallaPrincipal() {
                 BypassButton(
                     activo = bypassActivo,
                     onCambiar = { bypassActivo = it },
+                    onCambioFin = {},
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
                     borderColor = knobBorder,

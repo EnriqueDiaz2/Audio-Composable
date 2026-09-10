@@ -24,7 +24,8 @@ import kotlin.math.sin
 fun BassBoostKnob(
     label: String,
     value: Float,                        // 0f..1f, ahora viene de afuera
-    onValueChange: (Float) -> Unit,       // avisa al padre cuando cambia
+    onValueChange: (Float) -> Unit,
+    onValueChangeFinished: () -> Unit,       // avisa al padre cuando cambia
     valueText: (Float) -> String,         // formatea el valor como texto (ej. { "${(it*100).toInt()}" })
     modifier: Modifier = Modifier,
     accentColor: Color,
@@ -58,6 +59,8 @@ fun BassBoostKnob(
                         val nuevoValor = (normalizedAngle / 270f).coerceIn(0f, 1f)
                         onValueChange(nuevoValor)
                         change.consume()
+
+                        onValueChangeFinished()
                     }
                 }
         ) {

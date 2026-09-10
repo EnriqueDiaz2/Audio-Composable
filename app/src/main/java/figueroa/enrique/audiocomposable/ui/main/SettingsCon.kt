@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -99,16 +100,10 @@ fun SettingsScreen(
 
     val context = LocalContext.current
 
-    var tiempoRespuesta by remember {
-        mutableStateOf(50f)
-    }
+    var tiempoRespuesta by remember { mutableFloatStateOf(50f) }
 
-    var mostrarDialogoTerminos by remember {
-        mutableStateOf(false)
-    }
-    var mostrarDialogoAbout by remember {
-        mutableStateOf(false)
-    }
+    var mostrarDialogoTerminos by remember { mutableStateOf(false) }
+    var mostrarDialogoAbout by remember { mutableStateOf(false) }
 
     val seleccionarCarpeta = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -156,8 +151,7 @@ fun SettingsScreen(
                 .background(background)
         ) {
             Column(
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp)
             ) {
                 Text(
                     text = "Modo Obscuro",
@@ -169,8 +163,7 @@ fun SettingsScreen(
                 )
             }
             Column(
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp)
             ) {
                 Text(
                     text = "Comunicacion",
@@ -193,8 +186,7 @@ fun SettingsScreen(
                 }
             }
             Column(
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp)
             ) {
                 Text(
                     text = "Guardar en una carpeta los presets",
@@ -216,8 +208,7 @@ fun SettingsScreen(
                 }
             }
             Column(
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp)
             ) {
                 Text(
                     text = "Tiempo de respuesta",
@@ -226,6 +217,7 @@ fun SettingsScreen(
                 Slider(
                     value = tiempoRespuesta,
                     onValueChange = { tiempoRespuesta = it },
+                    onValueChangeFinished = {},
                     valueRange = 0f..100f,
                     modifier = Modifier.fillMaxWidth()
                 )

@@ -3,22 +3,24 @@ package figueroa.enrique.audiocomposable.ui.views
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
-import kotlin.math.min
+import androidx.compose.material3.Text
 
 @Composable
 fun BypassButton(
     activo: Boolean,
     onCambiar: (Boolean) -> Unit,
+    onCambioFin: () -> Unit,
     modifier: Modifier = Modifier,
     accentColor: Color,
     backgroundColor: Color,
@@ -26,43 +28,64 @@ fun BypassButton(
     textPrimary: Color,
     textSecondary: Color
 ) {
+    // Siempre apunta al valor más reciente de "activo", aunque el pointerInput no se recree
+    val activoActual by rememberUpdatedState(activo)
+
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
-        Box(
+        Canvas(
             modifier = Modifier
-                .size(64.dp)
+                .size(100.dp)
                 .pointerInput(Unit) {
                     detectTapGestures {
-                        onCambiar(!activo)
+                        onCambiar(!activoActual)
+                        onCambioFin()
                     }
                 }
         ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val center = Offset(size.width / 2f, size.height / 2f)
-                val radius = min(size.width, size.height) / 2f
+            val radius = size.minDimension * 0.40f
 
-                // Círculo relleno: color de acento si está activo, fondo normal si no
-                drawCircle(
-                    color = if (activo) accentColor else backgroundColor,
-                    center = center,
-                    radius = radius
-                )
-
-                // Borde del círculo
-                drawCircle(
-                    color = borderColor,
-                    center = center,
-                    radius = radius,
-                    style = Stroke(width = 2.dp.toPx())
-                )
-            }
+            drawCircle(
+                color = backgroundColor,
+                radius = radius,
+                center = Offset(size.width / 2f, size.height / 2f)
+            )
+            drawCircle(
+                color = if (activo) accentColor else borderColor,
+                radius = radius,
+                center = Offset(size.width / 2f, size.height / 2f),
+                style = Stroke(width = 3.dp.toPx())
+            )
+            drawLine(
+                color = if (activo) accentColor else textSecondary,
+                start = Offset(size.width / 2f, size.height * 0.25f),
+                end = Offset(size.width / 2f, size.height * 0.50f),
+                strokeWidth = 5.dp.toPx(),
+                cap = StrokeCap.Round
+            )
+            drawArc(
+                color = if (activo) accentColor else textSecondary,
+                startAngle = -50f,
+                sweepAngle = 280f,
+                useCenter = false,
+                topLeft = Offset(size.width * 0.25f, size.height * 0.25f),
+                size = androidx.compose.ui.geometry.Size(size.width * 0.50f, size.height * 0.50f),
+                style = Stroke(width = 5.dp.toPx())
+            )
         }
-
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(text = if (activo) "Sí" else "No", color = textSecondary, fontSize = 12.sp)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = if (activo) "Sí" else "No",
+            color = textSecondary,
+            fontSize = 12.sp
+        )
         Spacer(modifier = Modifier.height(2.dp))
-        Text(text = "Bypass", color = textPrimary, fontSize = 14.sp)
+        Text(
+            text = "Bipass",
+            color = textPrimary,
+            fontSize = 14.sp
+        )
     }
 }
