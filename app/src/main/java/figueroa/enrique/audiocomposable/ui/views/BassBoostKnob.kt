@@ -25,7 +25,7 @@ fun BassBoostKnob(
     label: String,
     value: Float,                        // 0f..1f, ahora viene de afuera
     onValueChange: (Float) -> Unit,
-    onValueChangeFinished: () -> Unit,       // avisa al padre cuando cambia
+    onValueChangeFinished : () -> Unit,       // avisa al padre cuando cambia
     valueText: (Float) -> String,         // formatea el valor como texto (ej. { "${(it*100).toInt()}" })
     modifier: Modifier = Modifier,
     accentColor: Color,

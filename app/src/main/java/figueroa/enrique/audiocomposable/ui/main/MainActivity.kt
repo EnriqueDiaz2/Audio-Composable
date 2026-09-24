@@ -33,7 +33,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import figueroa.enrique.audiocomposable.iconos.GraphicEq
 import figueroa.enrique.audiocomposable.ui.views.BassBoostKnob
 import figueroa.enrique.audiocomposable.iconos.History
@@ -52,6 +52,7 @@ import figueroa.enrique.audiocomposable.iconos.Home
 import figueroa.enrique.audiocomposable.iconos.RadioButtonChecked
 import figueroa.enrique.audiocomposable.iconos.Settings
 import figueroa.enrique.audiocomposable.iconos.Tune
+import figueroa.enrique.audiocomposable.ui.HomeScreenViewModel
 import figueroa.enrique.audiocomposable.ui.ThemeState
 import figueroa.enrique.audiocomposable.ui.theme.AudioComposableTheme
 import figueroa.enrique.audiocomposable.ui.theme.DarkAccentRed
@@ -84,7 +85,7 @@ class MainActivity : ComponentActivity() {
         ThemeState.cargar(this)
         setContent {
             AudioComposableTheme(
-                darkTheme = true
+                darkTheme = ThemeState.modoOscuro.value
             ) {
                 PantallaPrincipal()
             }
@@ -94,8 +95,9 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaPrincipal() {
-    val darkTheme = true
+fun PantallaPrincipal(viewModel: HomeScreenViewModel = viewModel()) {
+    val darkTheme = ThemeState.modoOscuro.value
+
     val background =
         if (darkTheme)
             DarkBackground
@@ -150,13 +152,13 @@ fun PantallaPrincipal() {
         else
             LightBottomNavBackground
 
-    var threshold by remember { mutableFloatStateOf(0.5f) }
+    /*var threshold by remember { mutableFloatStateOf(0.5f) }
     var ratio by remember { mutableFloatStateOf(0.3f) }
-    var ataque by remember { mutableFloatStateOf(0.4f) }
+    var attack by remember { mutableFloatStateOf(0.4f) }
     var release by remember { mutableFloatStateOf(0.5f) }
     var knee by remember { mutableFloatStateOf(0.2f) }
     var makeup by remember { mutableFloatStateOf(0.5f) }
-    var bypassActivo by remember { mutableStateOf(false) }
+    var bypassActivo by remember { mutableStateOf(false) }*/
 
     val spectrumValues = remember {
         List(32) {
@@ -250,6 +252,7 @@ fun PantallaPrincipal() {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .padding(top = 8.dp)
                 .fillMaxSize()
                 .background(background)
         ) {
@@ -329,14 +332,14 @@ fun PantallaPrincipal() {
                     .weight(1f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(knobBackground)
-                    .horizontalScroll(rememberScrollState())
+                    .horizontalScroll(state = rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BassBoostKnob(
                     label = "Treashol",
-                    value = threshold,
-                    onValueChange = { threshold = it },
+                    value = viewModel.threshold,
+                    onValueChange = { viewModel.onThresholdChange(it) },
                     onValueChangeFinished = {},
                     valueText = { "${(it * 100 - 60).toInt()} dB" }, // ejemplo: rango -60dB a 0dB
                     accentColor = accentRed,
@@ -350,9 +353,9 @@ fun PantallaPrincipal() {
 
                 BassBoostKnob(
                     label = "Radio",
-                    value = ratio,
-                    onValueChange = { ratio = it },
-                    onValueChangeFinished = {},
+                    value = viewModel.ratio,
+                    onValueChange = { viewModel.onRatioChange(it) },
+                    onValueChangeFinished = { },
                     valueText = { "${(1 + it * 9).toInt()}:1" }, // ejemplo: rango 1:1 a 10:1
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -365,9 +368,9 @@ fun PantallaPrincipal() {
 
                 BassBoostKnob(
                     label = "Ataque",
-                    value = ataque,
-                    onValueChange = { ataque = it },
-                    onValueChangeFinished = {},
+                    value = viewModel.attack,
+                    onValueChange = { viewModel.onAttackChange(it) },
+                    onValueChangeFinished = { },
                     valueText = { "${(it * 100).toInt()} ms" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -380,9 +383,9 @@ fun PantallaPrincipal() {
 
                 BassBoostKnob(
                     label = "Release",
-                    value = release,
-                    onValueChange = { release = it },
-                    onValueChangeFinished = {},
+                    value = viewModel.release,
+                    onValueChange = { viewModel.onReleaseChange(it) },
+                    onValueChangeFinished = { },
                     valueText = { "${(it * 500).toInt()} ms" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -395,9 +398,9 @@ fun PantallaPrincipal() {
 
                 BassBoostKnob(
                     label = "Knee",
-                    value = knee,
-                    onValueChange = { knee = it },
-                    onValueChangeFinished = {},
+                    value = viewModel.knee,
+                    onValueChange = { viewModel.onKneeChange(it) },
+                    onValueChangeFinished = { },
                     valueText = { "${(it * 10).toInt()} dB" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -410,9 +413,9 @@ fun PantallaPrincipal() {
 
                 BassBoostKnob(
                     label = "Makeup",
-                    value = makeup,
-                    onValueChange = { makeup = it },
-                    onValueChangeFinished = {},
+                    value = viewModel.makeup,
+                    onValueChange = { viewModel.onMakeupChange(it) },
+                    onValueChangeFinished = { },
                     valueText = { "${(it * 40).toInt()} dB" },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
@@ -424,9 +427,9 @@ fun PantallaPrincipal() {
                     .width(24.dp))
 
                 BypassButton(
-                    activo = bypassActivo,
-                    onCambiar = { bypassActivo = it },
-                    onCambioFin = {},
+                    activo = viewModel.bypass,
+                    onCambiar = { viewModel.toggleBypass(it) },
+                    onCambioFin = { },
                     accentColor = accentRed,
                     backgroundColor = knobBackground,
                     borderColor = knobBorder,

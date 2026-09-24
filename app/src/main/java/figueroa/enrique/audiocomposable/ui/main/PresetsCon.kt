@@ -1,5 +1,6 @@
 package figueroa.enrique.audiocomposable.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,12 +8,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -30,12 +35,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.room3.Room
@@ -51,6 +58,7 @@ import figueroa.enrique.audiocomposable.iconos.Home
 import figueroa.enrique.audiocomposable.iconos.SaveAs
 import figueroa.enrique.audiocomposable.iconos.Settings
 import figueroa.enrique.audiocomposable.iconos.Tune
+import figueroa.enrique.audiocomposable.ui.AudioState
 import figueroa.enrique.audiocomposable.ui.ThemeState
 import figueroa.enrique.audiocomposable.ui.theme.AudioComposableTheme
 import figueroa.enrique.audiocomposable.ui.theme.DarkAccentRed
@@ -77,9 +85,9 @@ class PresetsCon : ComponentActivity() {
             applicationContext,
             AppDatabase::class.java,
             "app_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
-        val repository = PresetRepository(db.presetDao(), db.historialDao())
+        val repository = PresetRepository(db.presetDao(), db.historialDao(), db.parametersDao())
         val viewModel = PresetsViewModelFactory(repository)
             .create(PresetsViewModel::class.java)
 
@@ -87,15 +95,16 @@ class PresetsCon : ComponentActivity() {
             AudioComposableTheme(
                 darkTheme = ThemeState.modoOscuro.value
             ) {
-                PresetsScreen(viewModel = viewModel)
+                PresetsScreen(viewModel = viewModel, repository = repository)
             }
         }
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PresetsScreen(viewModel: PresetsViewModel) {
+fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
     val darkTheme = ThemeState.modoOscuro.value
 
     val background =
@@ -103,6 +112,12 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
             DarkBackground
         else
             LightBackground
+
+    val knobBackground =
+        if (darkTheme)
+            DarkKnobBackground
+        else
+            LightKnobBackground
 
     val primary =
         if (darkTheme)
@@ -134,16 +149,9 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
         else
             LightBottomNavBackground
 
-    val knobBackground =
-        if (darkTheme)
-            DarkKnobBackground
-        else
-            LightKnobBackground
-
-    var name by remember { mutableStateOf("") }
-    var gener by remember { mutableStateOf("") }
-    var place by remember { mutableStateOf("") }
-    var parameters by remember { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var gener by rememberSaveable { mutableStateOf("") }
+    var place by rememberSaveable { mutableStateOf("") }
 
     val context = LocalContext.current
     val presets by viewModel.presets.collectAsState()
@@ -153,14 +161,12 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
         name = preset.name
         gener = preset.gener
         place = preset.place
-        parameters = preset.parameters
     }
 
     fun limpiarCampos() {
         name = ""
         gener = ""
         place = ""
-        parameters = ""
     }
 
     Scaffold(
@@ -254,6 +260,12 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
+                    singleLine = true,
+                    maxLines = 10,
+                    minLines = 1,
+                    placeholder = { Text("Blue Jazz") },
+                    keyboardOptions = KeyboardOptions( keyboardType = KeyboardType.Text),
+                    shape = CircleShape,
                     label = {
                         Text(
                             text = "Nombre Del Preset",
@@ -265,6 +277,12 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
                 OutlinedTextField(
                     value = gener,
                     onValueChange = { gener = it },
+                    singleLine = true,
+                    maxLines = 8,
+                    minLines = 1,
+                    placeholder = { Text("Rock") },
+                    keyboardOptions = KeyboardOptions( keyboardType = KeyboardType.Text),
+                    shape = CircleShape,
                     label = {
                         Text(
                             text = "Genero",
@@ -276,6 +294,12 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
                 OutlinedTextField(
                     value = place,
                     onValueChange = { place = it },
+                    singleLine = true,
+                    maxLines = 10,
+                    minLines = 1,
+                    placeholder = { Text("Estudio") },
+                    keyboardOptions = KeyboardOptions( keyboardType = KeyboardType.Text),
+                    shape = CircleShape,
                     label = {
                         Text(
                             text = "Lugar",
@@ -284,20 +308,20 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = parameters,
-                    onValueChange = { parameters = it },
-                    label = {
-                        Text(
-                            text = "Parametros",
-                            color = textSecondary
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
                 FloatingActionButton(
                     onClick = {
-                        viewModel.guardarPreset(name.trim(), gener.trim(), place.trim(), parameters.trim())
+                        viewModel.guardarPreset(
+                            name.trim(),
+                            gener.trim(),
+                            place.trim(),
+                            thresold = AudioState.threshold,
+                            ratio = AudioState.ratio,
+                            attack = AudioState.attack,
+                            releases = AudioState.release,
+                            knee = AudioState.knee,
+                            makeup = AudioState.makeup,
+                            bypass = AudioState.bypass
+                        )
                         limpiarCampos()
                     },
                     containerColor = knobBackground,
@@ -313,74 +337,101 @@ fun PresetsScreen(viewModel: PresetsViewModel) {
             }
             LazyColumn {
                 items(presets) { preset: Preset ->
-                    Card(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(preset.name)
-                                Text(preset.gener)
-                                Text(preset.place)
-                                Text(preset.parameters)
-                            }
-                            Row {
-                                IconButton(
-                                    onClick = {
-                                        viewModel.actualizarPreset(preset)
-                                        cargarCampos(preset)
-                                    },
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .background(knobBackground),
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = knobBackground,
-                                        contentColor = accentRed
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Edit,
-                                        contentDescription = "Editar",
-                                        tint = accentRed
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        viewModel.eliminarPreset(preset)
-                                    },
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .background(knobBackground),
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = knobBackground,
-                                        contentColor = accentRed
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = DeleteF,
-                                        contentDescription = "Eliminar",
-                                        tint = accentRed
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    PresetItemCard(
+                        preset = preset,
+                        repository = repository,
+                        viewModel = viewModel,
+                        knobBackground = knobBackground,
+                        accentRed = accentRed,
+                        textSecondary = textSecondary,
+                        cargarCampos = ::cargarCampos
+                    )
                 }
             }
         }
     }
 }
 
-/*@Preview
 @Composable
-fun PresetsScreenPreview() {
-    PresetsScreen()
-}*/
+fun PresetItemCard(
+    preset: Preset,
+    repository: PresetRepository,
+    viewModel: PresetsViewModel,
+    knobBackground: Color,
+    accentRed: Color,
+    textSecondary: Color,
+    cargarCampos: (Preset) -> Unit
+) {
+    val parameters by repository.obtenerParametroPorPresetId(preset.id).collectAsState(initial = null)
+
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = preset.name, fontSize = 16.sp)
+                Text(text = preset.gener, fontSize = 14.sp, color = textSecondary)
+                Text(text = preset.place, fontSize = 14.sp, color = textSecondary)
+
+                parameters?.let { p ->
+                    Spacer(modifier = Modifier.padding(top = 4.dp))
+                    Text(text = "Threshold: ${p.threshold}", fontSize = 12.sp, color = textSecondary)
+                    Text(text = "Ratio: ${p.ratio}", fontSize = 12.sp, color = textSecondary)
+                    Text(text = "Attack: ${p.attack}", fontSize = 12.sp, color = textSecondary)
+                    Text(text = "Release: ${p.releases}", fontSize = 12.sp, color = textSecondary)
+                    Text(text = "Knee: ${p.knee}", fontSize = 12.sp, color = textSecondary)
+                    Text(text = "Makeup: ${p.makeup}", fontSize = 12.sp, color = textSecondary)
+                    Text(text = "Bypass: ${p.bypass}", fontSize = 12.sp, color = textSecondary)
+                }
+            }
+            Row {
+                IconButton(
+                    onClick = {
+                        viewModel.actualizarPreset(preset)
+                        cargarCampos(preset)
+                    },
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(knobBackground),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = knobBackground,
+                        contentColor = accentRed
+                    )
+                ) {
+                    Icon(
+                        imageVector = Edit,
+                        contentDescription = "Editar",
+                        tint = accentRed
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        viewModel.eliminarPreset(preset)
+                    },
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(knobBackground),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = knobBackground,
+                        contentColor = accentRed
+                    )
+                ) {
+                    Icon(
+                        imageVector = DeleteF,
+                        contentDescription = "Eliminar",
+                        tint = accentRed
+                    )
+                }
+            }
+        }
+    }
+}

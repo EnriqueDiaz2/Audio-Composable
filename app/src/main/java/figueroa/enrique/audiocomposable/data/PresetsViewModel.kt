@@ -2,6 +2,7 @@ package figueroa.enrique.audiocomposable.data
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import figueroa.enrique.audiocomposable.data.model.Parameters
 import figueroa.enrique.audiocomposable.data.repository.PresetRepository
 import figueroa.enrique.audiocomposable.data.model.Preset
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,15 +30,17 @@ class PresetsViewModel(
         presetEnEdicion = preset
     }
 
-    fun guardarPreset(name: String, gener: String, place: String, parameters: String) {
+    fun guardarPreset(name: String, gener: String, place: String, thresold: Float, ratio: Float, attack: Float, releases: Float, knee: Float, makeup: Float, bypass: Boolean) {
         viewModelScope.launch {
             val enEdicion = presetEnEdicion
             if (enEdicion == null) {
-                val preset = Preset(name = name, gener = gener, place = place, parameters = parameters)
-                repository.guardarPresetConHistorial(preset)
+                val preset = Preset(name = name, gener = gener, place = place)
+                val parametros = Parameters(threshold = thresold, ratio = ratio, attack = attack, releases = releases, knee = knee, makeup = makeup, bypass = bypass, preset_id = 0)
+                repository.guardarPresetConHistorial(preset, parametros)
             } else {
-                val preset = enEdicion.copy(name = name, gener = gener, place = place, parameters = parameters)
-                repository.actualizarPresets(preset)
+                val preset = enEdicion.copy(name = name, gener = gener, place = place)
+                val parametros = Parameters(threshold = thresold, ratio = ratio, attack = attack, releases = releases, knee = knee, makeup = makeup, bypass = bypass, preset_id = enEdicion.id)
+                repository.actualizarPresets(preset, parametros)
             }
             presetEnEdicion = null
         }

@@ -123,7 +123,7 @@ fun VuMeter(
         drawContext.canvas.nativeCanvas.drawText("VU", anchoTotal * 0.5f, altoTotal * 0.5f, paintVU)
 
         val paintMarca = Paint(paintNegro).apply { textSize = anchoTotal * 0.035f }
-        drawContext.canvas.nativeCanvas.drawText("DUB STUDIO CORP.", anchoTotal * 0.5f, altoTotal * 0.6f, paintMarca)
+        drawContext.canvas.nativeCanvas.drawText("Audio Compressor STUDIO CORP.", anchoTotal * 0.5f, altoTotal * 0.6f, paintMarca)
 
         val anguloAgujaRad = (anguloInicio + (anguloFin - anguloInicio) * (valorAnimado - (-20f)) / (3f - (-20f))) * PI / 180f
         val largoAguja = radioArco * 0.95f

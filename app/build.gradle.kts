@@ -6,9 +6,7 @@ plugins {
 
 android {
     namespace = "figueroa.enrique.audiocomposable"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "figueroa.enrique.audiocomposable"
@@ -38,6 +36,7 @@ android {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)

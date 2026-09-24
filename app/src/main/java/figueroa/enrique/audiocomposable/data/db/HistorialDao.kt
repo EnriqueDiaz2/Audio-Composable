@@ -17,9 +17,18 @@ interface HistorialDao {
         """
         SELECT h.id AS id,
                p.name AS presetName,
+             params.id AS parametersId,
+             params.threshold AS threshold,
+             params.ratio AS ratio,
+             params.attack AS attack,
+             params.releases AS releases,
+             params.knee AS knee,
+             params.makeup AS makeup,
+             params.bypass AS bypass,
                h.fechaHora AS fechaHora
         FROM historial h
         INNER JOIN presets p ON p.id = h.preset_id
+        INNER JOIN parameters params ON params.id = h.parameters_id
         ORDER BY h.fechaHora DESC
         """
     )

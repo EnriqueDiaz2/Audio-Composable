@@ -5,11 +5,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,11 +48,13 @@ import figueroa.enrique.audiocomposable.ui.theme.DarkBottomNavBackground
 import figueroa.enrique.audiocomposable.ui.theme.DarkKnobBackground
 import figueroa.enrique.audiocomposable.ui.theme.DarkPrimary
 import figueroa.enrique.audiocomposable.ui.theme.DarkTextPrimary
+import figueroa.enrique.audiocomposable.ui.theme.DarkTextSecondary
 import figueroa.enrique.audiocomposable.ui.theme.LightBackground
 import figueroa.enrique.audiocomposable.ui.theme.LightBottomNavBackground
 import figueroa.enrique.audiocomposable.ui.theme.LightKnobBackground
 import figueroa.enrique.audiocomposable.ui.theme.LightPrimary
 import figueroa.enrique.audiocomposable.ui.theme.LightTextPrimary
+import figueroa.enrique.audiocomposable.ui.theme.LightTextSecondary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -61,7 +68,7 @@ class HistorialCon : ComponentActivity() {
             applicationContext,
             AppDatabase::class.java,
             "app_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
         val viewModel = HistorialViewModelFactory(db.historialDao())
             .create(HistorialViewModel::class.java)
@@ -107,6 +114,12 @@ fun HistorialScreen(viewModel: HistorialViewModel) {
             DarkPrimary
         else
             LightPrimary
+
+    val textSecondary =
+        if (darkTheme)
+            DarkTextSecondary
+        else
+            LightTextSecondary
 
     val bottomNav =
         if (darkTheme)
@@ -196,36 +209,51 @@ fun HistorialScreen(viewModel: HistorialViewModel) {
             }
         }
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .background(background)
         ) {
-            LazyColumn {
-                items(historial) { item: HistorialConPreset ->
-                    Card(
-                        modifier = Modifier
-                            .padding(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .background(knobBackground)
-                                .fillMaxSize()
-                        ) {
-                            Text(item.presetName)
-                            Text(formatearFecha(item.fechaHora))
-                        }
-                    }
-                }
+            items(historial) { item: HistorialConPreset ->
+                HistorialItemCard(
+                    historial = item,
+                    knobBackground = knobBackground,
+                    textSecondary = textSecondary
+                )
             }
         }
     }
 }
 
-/*@Preview(showBackground = true)
 @Composable
-fun HistorialScreenPreview() {
-    HistorialScreen()
-}*/
+fun HistorialItemCard(
+    knobBackground: Color,
+    historial: HistorialConPreset,
+    textSecondary: Color
+) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .clickable(
+                onClick = {
+                    // Acción al hacer clic en el elemento
+                }
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .background(knobBackground)
+                .fillMaxWidth()
+        ) {
+            Text(text = historial.presetName, fontSize = 16.sp)
+            Text(
+                text = formatearFecha(historial.fechaHora),
+                fontSize = 14.sp,
+                color = textSecondary
+            )
+        }
+    }
+}

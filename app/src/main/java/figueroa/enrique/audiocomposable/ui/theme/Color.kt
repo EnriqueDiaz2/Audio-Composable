@@ -7,42 +7,41 @@ import androidx.compose.ui.graphics.Color
 // =====================================================
 
 // Fondos
-val DarkBackground = Color(0xFF0B0813)
-val DarkSpectrumBackground = Color(0xFF131021)
-val DarkKnobBackground = Color(0xFF1A162E)
-val DarkKnobBorder = Color(0xFF2D274E)
+val DarkBackground = Color(0xFF100B1B)
+val DarkSpectrumBackground = Color(0xFF1E1929)
+val DarkKnobBackground = Color(0xFF251E33)
+val DarkKnobBorder = Color(0xFFD8B4FE)
 
 // Bottom Navigation
-val DarkBottomNavBackground = Color(0xFF110E1C)
+val DarkBottomNavBackground = Color(0xFF120D1C)
 
 // Elementos principales
-val DarkPrimary = Color(0xFF4F466F)
-val DarkTextPrimary = Color(0xFF8693B3)
-val DarkTextSecondary = Color(0xFF8B5CF6)
+val DarkPrimary = Color(0xFFA855F7)
+val DarkTextPrimary = Color(0xFFC084FC)
+val DarkTextSecondary = Color(0xFFD946EF)
 
 // Acentos
 //val DarkAccentOrange = Color(0xFFD97706)
-val DarkAccentRed = Color(0xFFBE123C)
+val DarkAccentRed = Color(0xFFEF4444)
 
 
 // =====================================================
 // TEMA CLARO
 // =====================================================
 
-// Fondos
-val LightBackground = Color(0xFFEEF2FF)
-val LightSpectrumBackground = Color(0xFFE0E7FF)
-val LightKnobBackground = Color(0xFFC7D2FE)
-val LightKnobBorder = Color(0xFFA5B4FC)
+// Fondos (saltos más marcados en la misma escala de violeta)
+val LightBackground = Color(0xFFD8CCF5)          // morado más marcado
+val LightSpectrumBackground = Color(0xFFA78BFA)  // violeta medio
+val LightKnobBackground = Color(0xFF8B5CF6)      // violeta más presente
+val LightKnobBorder = Color(0xFF4C1D95)          // violeta muy oscuro, alto contraste
 
 // Bottom Navigation
-val LightBottomNavBackground = Color(0xFFDCE2F9)
+val LightBottomNavBackground = Color(0xFFC4B5FD) // salto respecto al Background
 
 // Elementos principales
-val LightPrimary = Color(0xFF3730A3)
-val LightTextPrimary = Color(0xFF1E1B4B)
-val LightTextSecondary = Color(0xFF5B21B6)
+val LightPrimary = Color(0xFF7C3AED)
+val LightTextPrimary = Color(0xFF160B2E)         // casi negro, recupera contraste
+val LightTextSecondary = Color(0xFF6B0F72)  // fucsia oscuro, mismo tono pero con más contraste
 
 // Acentos
-//val LightAccentOrange = Color(0xFFC2410C)
-val LightAccentRed = Color(0xFFB91C1C)
+val LightAccentRed = Color(0xFFDC2626)
