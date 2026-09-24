@@ -14,10 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,6 +26,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,6 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -75,6 +76,8 @@ import figueroa.enrique.audiocomposable.ui.theme.LightKnobBackground
 import figueroa.enrique.audiocomposable.ui.theme.LightPrimary
 import figueroa.enrique.audiocomposable.ui.theme.LightTextPrimary
 import figueroa.enrique.audiocomposable.ui.theme.LightTextSecondary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class PresetsCon : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -152,6 +155,9 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
     var name by rememberSaveable { mutableStateOf("") }
     var gener by rememberSaveable { mutableStateOf("") }
     var place by rememberSaveable { mutableStateOf("") }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
     val presets by viewModel.presets.collectAsState()
@@ -323,6 +329,9 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                             bypass = AudioState.bypass
                         )
                         limpiarCampos()
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Preset guardado")
+                        }
                     },
                     containerColor = knobBackground,
                     contentColor = accentRed,
@@ -344,7 +353,9 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                         knobBackground = knobBackground,
                         accentRed = accentRed,
                         textSecondary = textSecondary,
-                        cargarCampos = ::cargarCampos
+                        cargarCampos = ::cargarCampos,
+                        scope = scope,
+                        snackbarHostState = snackbarHostState
                     )
                 }
             }
@@ -360,7 +371,9 @@ fun PresetItemCard(
     knobBackground: Color,
     accentRed: Color,
     textSecondary: Color,
-    cargarCampos: (Preset) -> Unit
+    cargarCampos: (Preset) -> Unit,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState
 ) {
     val parameters by repository.obtenerParametroPorPresetId(preset.id).collectAsState(initial = null)
 
@@ -416,6 +429,9 @@ fun PresetItemCard(
                 IconButton(
                     onClick = {
                         viewModel.eliminarPreset(preset)
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Preset eliminado")
+                        }
                     },
                     modifier = Modifier
                         .clip(CircleShape)
