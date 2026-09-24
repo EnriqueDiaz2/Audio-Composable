@@ -26,6 +26,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -156,8 +158,8 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
     var gener by rememberSaveable { mutableStateOf("") }
     var place by rememberSaveable { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
     val presets by viewModel.presets.collectAsState()
@@ -176,6 +178,9 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -316,6 +321,12 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                 )
                 FloatingActionButton(
                     onClick = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Preset guardado",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
                         viewModel.guardarPreset(
                             name.trim(),
                             gener.trim(),
@@ -329,9 +340,6 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                             bypass = AudioState.bypass
                         )
                         limpiarCampos()
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Preset guardado")
-                        }
                     },
                     containerColor = knobBackground,
                     contentColor = accentRed,
@@ -428,10 +436,13 @@ fun PresetItemCard(
                 }
                 IconButton(
                     onClick = {
-                        viewModel.eliminarPreset(preset)
                         scope.launch {
-                            snackbarHostState.showSnackbar("Preset eliminado")
+                            snackbarHostState.showSnackbar(
+                                "Preset eliminado",
+                                duration = SnackbarDuration.Short
+                            )
                         }
+                        viewModel.eliminarPreset(preset)
                     },
                     modifier = Modifier
                         .clip(CircleShape)
