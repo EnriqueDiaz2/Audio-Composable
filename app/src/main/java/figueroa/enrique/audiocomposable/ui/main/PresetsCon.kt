@@ -158,6 +158,8 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
     var gener by rememberSaveable { mutableStateOf("") }
     var place by rememberSaveable { mutableStateOf("") }
 
+    var intentoGuardar by rememberSaveable { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -175,6 +177,7 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
         name = ""
         gener = ""
         place = ""
+        intentoGuardar = false
     }
 
     Scaffold(
@@ -271,6 +274,7 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
+                    isError = name.length > 10 || (intentoGuardar && name.isBlank()),
                     singleLine = true,
                     maxLines = 10,
                     minLines = 1,
@@ -283,11 +287,19 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                             color = textSecondary
                         )
                     },
+                    supportingText = {
+                        if (name.length > 10) {
+                            Text("Este campo supera los caracteres permitidos")
+                        } else if (intentoGuardar && name.isBlank()) {
+                            Text("Este campo no puede estar vacío")
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = gener,
                     onValueChange = { gener = it },
+                    isError = gener.length > 8 || (intentoGuardar && gener.isBlank()),
                     singleLine = true,
                     maxLines = 8,
                     minLines = 1,
@@ -300,11 +312,19 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                             color = textSecondary
                         )
                     },
+                    supportingText = {
+                        if (gener.length > 8) {
+                            Text("Este campo supera los caracteres permitidos")
+                        } else if (intentoGuardar && gener.isBlank()) {
+                            Text("Este campo no puede estar vacío")
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = place,
                     onValueChange = { place = it },
+                    isError = place.length > 10 || (intentoGuardar && place.isBlank()),
                     singleLine = true,
                     maxLines = 10,
                     minLines = 1,
@@ -317,29 +337,50 @@ fun PresetsScreen(viewModel: PresetsViewModel, repository: PresetRepository) {
                             color = textSecondary
                         )
                     },
+                    supportingText = {
+                        if (place.length > 10) {
+                            Text("Este campo supera los caracteres permitidos")
+                        } else if (intentoGuardar && place.isBlank()) {
+                            Text("Este campo no puede estar vacío")
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 FloatingActionButton(
                     onClick = {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(
-                                "Preset guardado",
-                                duration = SnackbarDuration.Short
+                        intentoGuardar = true
+                        val nombreValido = name.isNotBlank()
+                        val generoValido = gener.isNotBlank()
+                        val lugarValido = place.isNotBlank()
+
+                        if (nombreValido && generoValido && lugarValido) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    "Preset guardado",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                            viewModel.guardarPreset(
+                                name.trim(),
+                                gener.trim(),
+                                place.trim(),
+                                thresold = AudioState.threshold,
+                                ratio = AudioState.ratio,
+                                attack = AudioState.attack,
+                                releases = AudioState.release,
+                                knee = AudioState.knee,
+                                makeup = AudioState.makeup,
+                                bypass = AudioState.bypass
                             )
+                            limpiarCampos()
+                        } else {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    "Completa todos los campos",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
                         }
-                        viewModel.guardarPreset(
-                            name.trim(),
-                            gener.trim(),
-                            place.trim(),
-                            thresold = AudioState.threshold,
-                            ratio = AudioState.ratio,
-                            attack = AudioState.attack,
-                            releases = AudioState.release,
-                            knee = AudioState.knee,
-                            makeup = AudioState.makeup,
-                            bypass = AudioState.bypass
-                        )
-                        limpiarCampos()
                     },
                     containerColor = knobBackground,
                     contentColor = accentRed,
