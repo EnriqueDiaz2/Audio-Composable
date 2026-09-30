@@ -4,11 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import figueroa.enrique.audiocomposable.R
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,9 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import figueroa.enrique.audiocomposable.iconos.ArrowBack
 import figueroa.enrique.audiocomposable.iconos.ClearDay
-import figueroa.enrique.audiocomposable.iconos.Folder
 import figueroa.enrique.audiocomposable.iconos.Info
 import figueroa.enrique.audiocomposable.iconos.Listalt
+import figueroa.enrique.audiocomposable.iconos.LockIc
 import figueroa.enrique.audiocomposable.iconos.NightLight
 import figueroa.enrique.audiocomposable.iconos.Timelapse
 import figueroa.enrique.audiocomposable.iconos.settings_bluetooth
@@ -143,15 +140,16 @@ fun SettingsScreen(
     var tiempoRespuesta by remember { mutableFloatStateOf(50f) }
 
     var mostrarDialogoTerminos by remember { mutableStateOf(false) }
+    var mostrarDialogoPrivacidad by remember { mutableStateOf(false) }
     var mostrarDialogoAbout by remember { mutableStateOf(false) }
 
-    val seleccionarCarpeta = rememberLauncherForActivityResult(
+    /*val seleccionarCarpeta = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         if (uri != null) {
             Toast.makeText(context, "Carpeta seleccionada", Toast.LENGTH_SHORT).show()
         }
-    }
+    }*/
 
     Scaffold(
         topBar = {
@@ -265,6 +263,11 @@ fun SettingsScreen(
                     )
                 }
             }
+            /*
+            Poner en Manifiest si se necesita
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
             Column(
                 modifier = Modifier
                     .padding(start = 12.dp, bottom = 24.dp, end = 5.dp)
@@ -301,7 +304,7 @@ fun SettingsScreen(
                         modifier = Modifier.size(SwitchDefaults.IconSize)
                     )
                 }
-            }
+            }*/
             Column(
                 modifier = Modifier
                     .padding(bottom = 24.dp, start = 10.dp, end = 5.dp)
@@ -379,6 +382,38 @@ fun SettingsScreen(
             ) {
                 OutlinedButton(
                     onClick = {
+                        mostrarDialogoPrivacidad = true
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = bottomNav
+                    ),
+                    border = BorderStroke(
+                        width = 2.dp,
+                        color = knobBorder
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Privacidad",
+                        color = textPrimary,
+                        modifier = Modifier.padding(end = 5.dp)
+                    )
+                    Icon(
+                        imageVector = LockIc,
+                        contentDescription = null,
+                        tint = textPrimary,
+                        modifier = Modifier.size(SwitchDefaults.IconSize)
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(start = 12.dp, bottom = 24.dp, end = 5.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
                         mostrarDialogoAbout = true
                     },
                     colors = ButtonDefaults.outlinedButtonColors(
@@ -444,6 +479,46 @@ fun SettingsScreen(
             },
             text = {
                 Text("Aqui va el texto de terminos y condiciones.")
+            }
+        )
+    }
+
+    if (mostrarDialogoPrivacidad) {
+        AlertDialog(
+            onDismissRequest = {
+                mostrarDialogoPrivacidad = false
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mostrarDialogoPrivacidad = false
+                    },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = bottomNav,
+                        contentColor = Color.White
+                    ),
+                    elevation = ButtonDefaults.elevatedButtonElevation(
+                        defaultElevation = 8.dp,
+                        pressedElevation = 10.dp,
+                        disabledElevation = 2.dp,
+                        hoveredElevation = 8.dp,
+                        focusedElevation = 8.dp
+                    )
+                ) {
+                    Text(
+                        text = "Cerrar",
+                        color = textPrimary
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = "Privacidad",
+                    color = primary
+                )
+            },
+            text = {
+                Text("Aqui va el texto de privacidad.")
             }
         )
     }
